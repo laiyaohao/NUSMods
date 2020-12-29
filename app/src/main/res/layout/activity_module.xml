@@ -16,28 +16,36 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/module_code"
-            android:textAlignment="viewStart"
-            android:textSize="18dp"
-            android:paddingTop="10dp"/>
+
+            android:textSize="20sp"
+            android:padding="10dp"/>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/module_title"
-            android:textAlignment="viewStart"
-            android:textSize="18dp"
-            android:paddingTop="10dp"/>
+
+            android:textSize="20sp"
+            android:padding="10dp"/>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/module_semesters"/>
+            android:id="@+id/module_department_faculty_credit"
+            android:padding="10dp"/>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/module_department_faculty_credit"/>
+            android:id="@+id/module_semesters"
+            android:padding="10dp"/>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/module_description" />
+            android:id="@+id/module_precoreqpreclusion"
+            android:padding="10dp"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/module_description"
+            android:padding="10dp"/>
 
     </LinearLayout>
 </ScrollView>

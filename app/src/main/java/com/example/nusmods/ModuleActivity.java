@@ -17,6 +17,8 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.LinkedList;
+
 
 public class ModuleActivity extends AppCompatActivity {
     private String moduleCode;
@@ -27,6 +29,7 @@ public class ModuleActivity extends AppCompatActivity {
     private TextView moduleSemestersTextView;
     private TextView moduleDepFacCredTextView;
     private TextView moduleDescriptionTextView;
+    private TextView modulePreCoReqPrecluTextView;
     private String url;
     private RequestQueue requestQueue;
 
@@ -59,10 +62,12 @@ public class ModuleActivity extends AppCompatActivity {
         moduleSemestersTextView.setText(semesterString.toString());
 
         moduleDepFacCredTextView = findViewById(R.id.module_department_faculty_credit);
+
+        modulePreCoReqPrecluTextView = findViewById(R.id.module_precoreqpreclusion);
+
         moduleDescriptionTextView = findViewById(R.id.module_description);
 
-        moduleDepFacCredTextView = findViewById(R.id.module_department_faculty_credit);
-        moduleDescriptionTextView = findViewById(R.id.module_description);
+
 
         loadModuleInfo();
     }
@@ -85,9 +90,32 @@ public class ModuleActivity extends AppCompatActivity {
                     String depFacCred = response.getString("department") + " | "
                             + response.getString("faculty") + " | "
                             + response.getString("moduleCredit") + " MCs";
-                    String description = response.getString("description");
+                    String description = "Module Description:\n" + "\n" + response.getString("description");
                     moduleDepFacCredTextView.setText(depFacCred);
                     moduleDescriptionTextView.setText(description);
+                    StringBuilder preCoReqPrecluText = new StringBuilder();
+                    preCoReqPrecluText.append("Pre-Requisite(s):\n");
+                    if (response.has("prerequisite")) {
+                        // module has pre-requisites
+                        preCoReqPrecluText.append("\n");
+                        preCoReqPrecluText.append(response.getString("prerequisite"));
+                        preCoReqPrecluText.append("\n");
+                    }
+                    preCoReqPrecluText.append("\nPreclusion(s):\n");
+                    if (response.has("preclusion")) {
+                        // module has pre-requisites
+                        preCoReqPrecluText.append("\n");
+                        preCoReqPrecluText.append(response.getString("preclusion"));
+                        preCoReqPrecluText.append("\n");
+                    }
+                    preCoReqPrecluText.append("\nCo-Requisite(s):\n");
+                    if (response.has("corequisite")) {
+                        // module has pre-requisites
+                        preCoReqPrecluText.append("\n");
+                        preCoReqPrecluText.append(response.getString("preclusion"));
+                        preCoReqPrecluText.append("\n");
+                    }
+                    modulePreCoReqPrecluTextView.setText(preCoReqPrecluText.toString());
                 } catch (JSONException e) {
                     Log.e("module_info", "json error");
                 }
@@ -100,4 +128,5 @@ public class ModuleActivity extends AppCompatActivity {
         });
         requestQueue.add(request);
     }
+
 }
