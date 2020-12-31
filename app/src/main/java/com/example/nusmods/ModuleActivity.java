@@ -30,6 +30,7 @@ public class ModuleActivity extends AppCompatActivity {
     private TextView moduleDepFacCredTextView;
     private TextView moduleDescriptionTextView;
     private TextView modulePreCoReqPrecluTextView;
+    private TextView moduleAddInfoTextView;
     private String url;
     private RequestQueue requestQueue;
 
@@ -67,7 +68,7 @@ public class ModuleActivity extends AppCompatActivity {
 
         moduleDescriptionTextView = findViewById(R.id.module_description);
 
-
+        moduleAddInfoTextView = findViewById(R.id.module_addinfo);
 
         loadModuleInfo();
     }
@@ -84,41 +85,12 @@ public class ModuleActivity extends AppCompatActivity {
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                try {
-                    // look into the JSONObject, look into a key called results and parse it into a JSONArray
-                    // try catch block comes into play
-                    String depFacCred = response.getString("department") + " | "
-                            + response.getString("faculty") + " | "
-                            + response.getString("moduleCredit") + " MCs";
-                    String description = "Module Description:\n" + "\n" + response.getString("description");
-                    moduleDepFacCredTextView.setText(depFacCred);
-                    moduleDescriptionTextView.setText(description);
-                    StringBuilder preCoReqPrecluText = new StringBuilder();
-                    preCoReqPrecluText.append("Pre-Requisite(s):\n");
-                    if (response.has("prerequisite")) {
-                        // module has pre-requisites
-                        preCoReqPrecluText.append("\n");
-                        preCoReqPrecluText.append(response.getString("prerequisite"));
-                        preCoReqPrecluText.append("\n");
-                    }
-                    preCoReqPrecluText.append("\nPreclusion(s):\n");
-                    if (response.has("preclusion")) {
-                        // module has pre-requisites
-                        preCoReqPrecluText.append("\n");
-                        preCoReqPrecluText.append(response.getString("preclusion"));
-                        preCoReqPrecluText.append("\n");
-                    }
-                    preCoReqPrecluText.append("\nCo-Requisite(s):\n");
-                    if (response.has("corequisite")) {
-                        // module has pre-requisites
-                        preCoReqPrecluText.append("\n");
-                        preCoReqPrecluText.append(response.getString("preclusion"));
-                        preCoReqPrecluText.append("\n");
-                    }
-                    modulePreCoReqPrecluTextView.setText(preCoReqPrecluText.toString());
-                } catch (JSONException e) {
-                    Log.e("module_info", "json error");
-                }
+                // look into the JSONObject, look into a key called results and parse it into a JSONArray
+                // try catch block comes into play
+                loadDepFacCred(response);
+                loadDescription(response);
+                loadPreCoReqPreclu(response);
+                loadAddInfo(response);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -129,4 +101,96 @@ public class ModuleActivity extends AppCompatActivity {
         requestQueue.add(request);
     }
 
+    public void loadDepFacCred(JSONObject response) {
+        try {
+            String depFacCred = response.getString("department") + " | "
+                    + response.getString("faculty") + " | "
+                    + response.getString("moduleCredit") + " MCs";
+            moduleDepFacCredTextView.setText(depFacCred);
+        } catch (JSONException e) {
+            Log.e("module_depFacCred","depFacCred error");
+        }
+
+    }
+
+    public void loadDescription(JSONObject response) {
+        try {
+            String description = "Module Description:\n" + "\n" + response.getString("description");
+            moduleDescriptionTextView.setText(description);
+        } catch (JSONException e) {
+            Log.e("module_description","description error");
+        }
+    }
+
+    public void loadPreCoReqPreclu(JSONObject response) {
+        try {
+            StringBuilder preCoReqPrecluText = new StringBuilder();
+            preCoReqPrecluText.append("Pre-Requisite(s):\n");
+            if (response.has("prerequisite")) {
+                // module has pre-requisites
+                preCoReqPrecluText.append("\n");
+                preCoReqPrecluText.append(response.getString("prerequisite"));
+                preCoReqPrecluText.append("\n");
+            }
+            preCoReqPrecluText.append("\nPreclusion(s):\n");
+            if (response.has("preclusion")) {
+                // module has preclusions
+                preCoReqPrecluText.append("\n");
+                preCoReqPrecluText.append(response.getString("preclusion"));
+                preCoReqPrecluText.append("\n");
+            }
+            preCoReqPrecluText.append("\nCo-Requisite(s):\n");
+            if (response.has("corequisite")) {
+                // module has co-requisites
+                preCoReqPrecluText.append("\n");
+                preCoReqPrecluText.append(response.getString("preclusion"));
+                preCoReqPrecluText.append("\n");
+            }
+            modulePreCoReqPrecluTextView.setText(preCoReqPrecluText.toString());
+        } catch (JSONException e) {
+            Log.e("module_PreCoReqPreclu","PreCoReqPreclu error");
+        }
+    }
+
+    public void loadAddInfo(JSONObject response) {
+        StringBuilder addInfoText = new StringBuilder();
+        addInfoText.append("Additional Information:\n");
+        if (response.has("attributes")) {
+            try {
+                JSONObject attributes = response.getJSONObject("attributes");
+                if (attributes.has("su")) {
+                    addInfoText.append("\nHas S/U option for Undergraduate students only\n");
+                }
+                if (attributes.has("grsu")) {
+                    addInfoText.append("\nHas S/U option for Graduate students only\n");
+                }
+                if (attributes.has("lab")) {
+                    addInfoText.append("\nLab based module\n");
+                }
+                if (attributes.has("year")) {
+                    addInfoText.append("\nYear Long module\n");
+                }
+                if (attributes.has("fyp")) {
+                    addInfoText.append("\nHonours / Final Year Project\n");
+                }
+                if (attributes.has("ism")) {
+                    addInfoText.append("\nIndependent study module\n");
+                }
+                if (attributes.has("urop")) {
+                    addInfoText.append("\nUndergraduate Research Opportunities Program\n");
+                }
+                if (attributes.has("ssgf")) {
+                    addInfoText.append("\nSkillsFuture funded\n");
+                }
+                if (attributes.has("sfs")) {
+                    addInfoText.append("\nSkillsFuture series\n");
+                }
+            }
+            catch (JSONException e) {
+                Log.e("module_AddInfo","AddInfo error");
+            }
+
+        }
+        moduleAddInfoTextView.setText(addInfoText.toString());
+    }
 }
