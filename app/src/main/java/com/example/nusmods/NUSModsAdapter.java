@@ -6,6 +6,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -31,7 +33,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
-public class NUSModsAdapter extends RecyclerView.Adapter<NUSModsAdapter.NUSModsViewHolder> {
+public class NUSModsAdapter extends RecyclerView.Adapter<NUSModsAdapter.NUSModsViewHolder> implements Filterable {
     // class represent the data in recycler view
     public static class NUSModsViewHolder extends RecyclerView.ViewHolder {
         private LinearLayout containerView;
@@ -63,6 +65,7 @@ public class NUSModsAdapter extends RecyclerView.Adapter<NUSModsAdapter.NUSModsV
     }
 
     private List<Module> modules = new ArrayList<>();
+    private List<Module> modulesFull = new ArrayList<>();
     private RequestQueue requestQueue;
 
     NUSModsAdapter(Context context) {
@@ -96,6 +99,12 @@ public class NUSModsAdapter extends RecyclerView.Adapter<NUSModsAdapter.NUSModsV
                             semesters[j] = resultSemesters.getInt(j);
                         }
                         modules.add(new Module(
+                                result.getString("moduleCode"),
+                                result.getString("title"),
+                                semesters
+                        ));
+
+                        modulesFull.add(new Module(
                                 result.getString("moduleCode"),
                                 result.getString("title"),
                                 semesters
@@ -138,4 +147,41 @@ public class NUSModsAdapter extends RecyclerView.Adapter<NUSModsAdapter.NUSModsV
     public int getItemCount() {
         return modules.size();
     }
+
+
+
+    @Override
+    public Filter getFilter() {
+        return listfilter;
+    }
+    private Filter listfilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            List<Module> filteredModules = new ArrayList<>();
+            if (constraint == null || constraint.length() == 0) {
+                filteredModules.addAll(modulesFull);
+            }
+            else {
+                String filterPattern = constraint.toString().toLowerCase().trim();
+                for (Module module : modulesFull) {
+                    if (module.getModuleCode().toLowerCase().contains(filterPattern) ||
+                            module.getTitle().toLowerCase().contains(filterPattern)) {
+                        filteredModules.add(module);
+                    }
+
+
+                }
+            }
+            FilterResults results = new FilterResults();
+            results.values = filteredModules;
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            modules.clear();
+            modules.addAll((List) results.values);
+            notifyDataSetChanged();
+        }
+    };
 }
